@@ -46,8 +46,8 @@ export const login = async (req: Request, res: Response) => {
             res.status(401).json({ error: "Invalid login email and password." });
             return;
         }
-        const token = jwt.sign({ user }, String(process.env.JWT_SECRET), { expiresIn: "1h" });
-        res.status(200).json({ user, token, message: "Login successfull." });
+        const token = jwt.sign({ user }, String(process.env.JWT_SECRET), { expiresIn: "15d" });
+        res.status(200).json({ user, token, message: "Login successful." });
     } catch (error: any) {
         console.error("Error in login controller:", error.message);
         res.status(400).json({ error: "Error occured during user login." });
