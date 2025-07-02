@@ -1,12 +1,12 @@
 import { createContext, useEffect, useState } from "react";
-import type { User } from "../types/User"
+import type { User } from "../types/User";
 import { useNavigate } from "react-router";
-import { fetchUser } from "../services/authService";
+import { fetchMe } from "../services/authService";
 
 interface AuthContextType {
-  user: User | null,
-  login: (userData: User, token: string) => void,
-  logout: () => void
+  user: User | null;
+  login: (userData: User, token: string) => void;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,14 +21,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const token = localStorage.getItem("JWTtoken");
       if (token) {
         try {
-          const fetchedUser = await fetchUser();
+          const fetchedUser = await fetchMe();
           login(fetchedUser, token);
         } catch (error) {
           logout();
-        } finally {
-          setLoading(false);
         }
       }
+      setLoading(false);
     }
     authInit();
   }, []);

@@ -4,7 +4,7 @@ import type { User } from "../types/User";
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const API_BASE = `${BASE_URL}/api/auth`;
 
-export const fetchUser = async () => {
+export const fetchMe = async () => {
   try {
     const token = localStorage.getItem("JWTtoken");
     const response = await axios.get(`${API_BASE}/me`, {
@@ -13,7 +13,6 @@ export const fetchUser = async () => {
       }
     });
     const { user } = response.data;
-    console.log(response.data)
     return user as User;
   } catch (error: any) {
     console.log("Error from /me authRoute:", error.response?.data?.error|| error.message);

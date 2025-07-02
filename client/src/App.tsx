@@ -5,21 +5,24 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import ProtectedRoute from "./components/ProtectedRoute"
 import Home from "./pages/Home"
+import ChatProvider from "./contexts/chatContext"
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <div className="h-screen overflow-hidden flex flex-col">
-          <Navbar />
-          <div className="flex-1 overflow-hidden">
-            <Routes>
-              <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-            </Routes>
+        <ChatProvider>
+          <div className="h-screen overflow-hidden flex flex-col">
+            <Navbar />
+            <div className="flex-1 overflow-hidden">
+              <Routes>
+                <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+              </Routes>
+            </div>
           </div>
-        </div>
+        </ChatProvider>
       </AuthProvider>
     </BrowserRouter>
   )
