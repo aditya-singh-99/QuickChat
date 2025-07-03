@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { sendMessage } from "../services/messageService";
 import useChat from "../hooks/chatHook";
+import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 
 const MessageInput = () => {
   const { selectedChat } = useChat();
@@ -32,9 +33,9 @@ const MessageInput = () => {
         />
         <button
           type="submit"
-          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-semibold"
+          className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg cursor-pointer"
         >
-          Send
+          <PaperAirplaneIcon className="size-6"/>
         </button>
       </form>
     </div>

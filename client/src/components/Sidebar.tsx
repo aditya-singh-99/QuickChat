@@ -1,29 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Chat } from "../types/Chat";
-import { fetchAllChats } from "../services/chatService";
 import useAuth from "../hooks/authHook";
 import useChat from "../hooks/chatHook";
+import NewChatModal from "./NewChatModal";
+import { PlusIcon } from "@heroicons/react/24/solid";
 
 const Sidebar = () => {
   const { user } = useAuth();
-  const { setSelectedChat } = useChat();
-  const [chats, setChats] = useState<Chat[]>([]);
+  const { chats, setSelectedChat } = useChat();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const selectChat = (chat: Chat): void => {
     setSelectedChat(chat);
-  }
-
-  useEffect(() => {
-    const ChatsInit = async () => {
-      try {
-        const fetchedChats = await fetchAllChats();
-        setChats(fetchedChats);
-      } catch (error: any) {
-        alert(error.message);
-      }
-    }
-    ChatsInit();
-  }, []);
+  };
 
   return (
     <div className="h-full flex flex-col">
@@ -42,6 +31,17 @@ const Sidebar = () => {
           </div>
         ))}
       </div>
+      {isModalOpen ?
+        <NewChatModal onClose={() => setIsModalOpen(false)} />
+        :
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center bg-green-500 hover:bg-green-600 text-white mx-auto mb-4 px-4 py-2 rounded-full shadow-md cursor-pointer"
+        >
+          <PlusIcon className="size-5"/>
+           New Chat
+        </button>
+      }
     </div>
   );
 };

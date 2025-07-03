@@ -18,7 +18,7 @@ export const fetchMe = async () => {
     console.log("Error from /me authRoute:", error.response?.data?.error|| error.message);
     throw new Error(error.response?.data?.error|| error.message || "Error fetching user.");
   }
-}
+};
 
 export const loginUser = async (email: string, password: string) => {
   try {
@@ -37,7 +37,7 @@ export const loginUser = async (email: string, password: string) => {
     console.log("Error from /login authRoute:", error.response?.data?.error|| error.message);
     throw new Error(error.response?.data?.error|| error.message || "Error logging user.");
   }
-}
+};
 
 export const registerUser = async (name: string, email: string, password: string) => {
   try {
@@ -52,4 +52,4 @@ export const registerUser = async (name: string, email: string, password: string
     console.log("Error from /register authRoute:", error.response?.data?.error|| error.message);
     throw new Error(error.response?.data?.error || error.message || "Error registering user.");
   }
-}
+};

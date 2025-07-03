@@ -19,40 +19,45 @@ const ChatBox = () => {
       if (!selectedChat) {
         return;
       }
-      const cacheMessages = getMessagesForChat(selectedChat.id);
+      let cacheMessages = getMessagesForChat(selectedChat.id);
       if (!cacheMessages) {
         console.log("Fetching messages...");
         try {
-          const fetchedMessages = await fetchMessages(selectedChat.id);
-          setMessagesForChat(selectedChat.id, fetchedMessages);
-          setMessages(fetchedMessages);
+          cacheMessages = await fetchMessages(selectedChat.id);
         } catch (error: any) {
-          setMessages([]);
+          cacheMessages = [];
           alert(error.message);
         }
       }
+      setMessagesForChat(selectedChat.id, cacheMessages);
+      setMessages(cacheMessages);
     };
     loadChat();
   }, [selectedChat]);
 
   return (
-    selectedChat ? (
-      <div className="h-full flex flex-col">
-
-        <div className="p-4 border-b border-slate-700">
-          <h2 className="text-xl font-semibold">Selected Chat</h2>
-        </div>
-
-        <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
-          {messages.map((message, i) => (
-            <MessageBubble message={message} key={i} />
-          ))}
-          <div ref={scrollRef}></div>
-        </div>
-
-        <MessageInput />
+    <div className="h-full flex flex-col">
+      <div className="p-4 border-b border-slate-700">
+        <h2 className="text-xl font-semibold">{selectedChat ?
+          selectedChat.isGroup ? selectedChat.name : selectedChat.users[0].id === selectedChat.id ? selectedChat.users[1].name : selectedChat.users[0].name
+          : "Selected Chat"}
+        </h2>
       </div>
-    ) : (<h1>Nothing to show</h1>)
+
+      {selectedChat ?
+        <>
+          <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
+            {messages.map((message, i) => (
+              <MessageBubble message={message} key={i} />
+            ))}
+            <div ref={scrollRef}></div>
+          </div>
+
+          <MessageInput />
+        </> :
+        <></>
+      }
+    </div>
   );
 };
 

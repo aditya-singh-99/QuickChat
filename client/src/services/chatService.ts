@@ -18,4 +18,26 @@ export const fetchAllChats = async () => {
     console.log("Error from /me authRoute:", error.response?.data?.error || error.message);
     throw new Error(error.response?.data?.error || error.message || "Error fetching user.");
   }
-}
+};
+
+export const createChat = async (participant: string | string[], name?: string) => {
+  try {
+    const token = localStorage.getItem("JWTtoken");
+    const response = await axios.post(`${API_BASE}/`,
+      {
+        participant,
+        name
+      },
+      {
+        headers: {
+          Authorization: token
+        }
+      }
+    );
+    const { chat } = response.data;
+    return chat as Chat;
+  } catch (error: any) {
+    console.log("Error from /me authRoute:", error.response?.data?.error || error.message);
+    throw new Error(error.response?.data?.error || error.message || "Error fetching user.");
+  }
+};
