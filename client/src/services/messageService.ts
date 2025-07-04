@@ -7,7 +7,7 @@ const API_BASE = `${BASE_URL}/api/messages`;
 export const sendMessage = async (content: string, chatId: string) => {
   try {
     const token = localStorage.getItem("JWTtoken");
-    await axios.post(`${API_BASE}/`,
+    const response = await axios.post(`${API_BASE}/`,
       {
         content,
         chatId
@@ -18,6 +18,8 @@ export const sendMessage = async (content: string, chatId: string) => {
         }
       }
     );
+    const { message } = response.data;
+    return message as Message;
   } catch (error: any) {
     console.log("Error from / messageRoute:", error.response?.data?.error || error.message);
     throw new Error(error.response?.data?.error || error.message || "Error sending message.");

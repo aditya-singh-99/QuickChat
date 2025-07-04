@@ -7,14 +7,14 @@ export const sendMessage = async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
         const { content, chatId } = req.body;
-        await prisma.message.create({
+        const message = await prisma.message.create({
             data: {
                 content: content,
                 senderId: user.id,
                 chatId: chatId
             }
         })
-        res.status(201).json({ message: "Message sent successfully." });
+        res.status(201).json({ message });
     } catch (error: any) {
         console.error("Error in message controller:", error.message);
         res.status(400).json({ error: "Error occurred during sending message." });

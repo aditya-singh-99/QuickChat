@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import type { Message } from "../types/Message";
+import { useEffect, useRef } from "react";
 import MessageBubble from "./MessageBubble";
 import MessageInput from "./MessageInput";
 import useChat from "../hooks/chatHook";
@@ -8,11 +7,11 @@ import { fetchMessages } from "../services/messageService";
 const ChatBox = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { selectedChat, getMessagesForChat, setMessagesForChat } = useChat();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const messages = selectedChat ? getMessagesForChat(selectedChat.id) || [] : [];
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: "instant" });
-  }, [selectedChat]);
+  }, [messages]);
 
   useEffect(() => {
     const loadChat = async () => {
@@ -30,7 +29,6 @@ const ChatBox = () => {
         }
       }
       setMessagesForChat(selectedChat.id, cacheMessages);
-      setMessages(cacheMessages);
     };
     loadChat();
   }, [selectedChat]);

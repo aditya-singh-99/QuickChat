@@ -27,7 +27,7 @@ const Sidebar = () => {
             onClick={_ => selectChat(chat)}
           >
             <h3 className="font-medium">{chat.isGroup ? chat.name : chat.users[0].id === user?.id ? chat.users[1].name : chat.users[0].name}</h3>
-            <p className="text-sm text-slate-400">Last message preview...</p>
+            {chat.messages?.[0] && <p className="text-sm text-slate-400">{chat.messages[0].content}</p>}
           </div>
         ))}
       </div>
@@ -38,8 +38,8 @@ const Sidebar = () => {
           onClick={() => setIsModalOpen(true)}
           className="flex items-center bg-green-500 hover:bg-green-600 text-white mx-auto mb-4 px-4 py-2 rounded-full shadow-md cursor-pointer"
         >
-          <PlusIcon className="size-5"/>
-           New Chat
+          <PlusIcon className="size-5" />
+          New Chat
         </button>
       }
     </div>

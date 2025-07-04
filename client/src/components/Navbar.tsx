@@ -8,7 +8,7 @@ const Navbar = () => {
     <header className="w-full bg-slate-800 border-b border-slate-700 px-4 py-3">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         <Link to="/" className="text-green-400 font-bold text-xl tracking-wide">
-          ChatOn
+          QuickChat
         </Link>
 
         {user ? (

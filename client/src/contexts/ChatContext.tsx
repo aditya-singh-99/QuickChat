@@ -6,6 +6,7 @@ import { fetchAllChats } from "../services/chatService";
 interface ChatContextType {
   chats: Chat[];
   addNewChat: (chat: Chat) => void;
+  updateRecentMessage: (message: Message) => void;
   selectedChat: Chat | null;
   setSelectedChat: (chat: Chat) => void;
   getMessagesForChat: (chatId: string) => Message[] | undefined;
@@ -19,11 +20,21 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messagesMap, setMessagesMap] = useState<Map<string, Message[]>>(new Map());
 
+  const sortChats = (chatList: Chat[]) => {
+    return chatList.sort((a, b) => {
+      const aTimeStr = a.messages?.[0]?.createdAt || a.updatedAt;
+      const bTimeStr = b.messages?.[0]?.createdAt || b.updatedAt;
+      const aTime = new Date(aTimeStr);
+      const bTime = new Date(bTimeStr);
+      return bTime.getTime() - aTime.getTime();
+    });
+  };
+
   useEffect(() => {
     const ChatsInit = async () => {
       try {
         const fetchedChats = await fetchAllChats();
-        setChats(fetchedChats);
+        setChats(sortChats(fetchedChats));
       } catch (error: any) {
         alert(error.message);
       }
@@ -33,6 +44,20 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
 
   const addNewChat = (chat: Chat) => {
     setChats((prev) => [chat, ...prev]);
+  };
+
+  const updateRecentMessage = (message: Message) => {
+    setChats((prevChats) => {
+      const updatedChats = prevChats.map((chat) =>
+        chat.id === message.chatId
+          ? {
+            ...chat,
+            messages: [message],
+          }
+          : chat
+      );
+      return sortChats(updatedChats);
+    });
   };
 
   const getMessagesForChat = (chatId: string): Message[] | undefined => {
@@ -48,7 +73,7 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <ChatContext value={{ chats, addNewChat, selectedChat, setSelectedChat, getMessagesForChat, setMessagesForChat }}>
+    <ChatContext value={{ chats, addNewChat, updateRecentMessage, selectedChat, setSelectedChat, getMessagesForChat, setMessagesForChat }}>
       {children}
     </ChatContext>
   )

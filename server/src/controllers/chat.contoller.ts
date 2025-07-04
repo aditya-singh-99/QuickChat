@@ -18,6 +18,9 @@ export const getChats = async (req: Request, res: Response) => {
                 id: true,
                 name: true,
                 isGroup: true,
+                adminId: true,
+                createdAt: true,
+                updatedAt: true,
                 users: {
                     select: {
                         id: true,
@@ -28,14 +31,8 @@ export const getChats = async (req: Request, res: Response) => {
                     orderBy: {
                         createdAt: 'desc'
                     },
-                    take: 1,
-                    select: {
-                        content: true
-                    }
+                    take: 1
                 }
-            },
-            orderBy: {
-                updatedAt: 'desc'
             }
         });
         res.status(200).json({ chats, message: "All chats retrieved successfully." });

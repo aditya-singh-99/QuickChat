@@ -3,13 +3,15 @@ import type { User } from "../types/User";
 import type { Chat } from "../types/Chat";
 import { searchUsers } from "../services/userService";
 import useAuth from "../hooks/authHook";
-import { createChat } from "../services/chatService";
 import useChat from "../hooks/chatHook";
+import useSocket from "../hooks/socketHook";
+import { createChat } from "../services/chatService";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 const NewChatModal = ({ onClose }: { onClose: () => void }) => {
   const { user: currUser } = useAuth();
   const { addNewChat, setSelectedChat } = useChat();
+  const { emitChatCreation } = useSocket();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<User[]>([]);
   const [selected, setSelected] = useState<User[]>([]);
@@ -39,6 +41,7 @@ const NewChatModal = ({ onClose }: { onClose: () => void }) => {
         chat.users = [user];
         if (currUser)
           chat.users.push(currUser);
+        emitChatCreation(chat);
         updateCurrentChat(chat);
         onClose();
       } catch (error: any) {
@@ -54,6 +57,7 @@ const NewChatModal = ({ onClose }: { onClose: () => void }) => {
       chat.users = selected;
       if (currUser)
         chat.users.push(currUser);
+      emitChatCreation(chat);
       updateCurrentChat(chat);
       onClose();
     } catch (error: any) {

@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { sendMessage } from "../services/messageService";
 import useChat from "../hooks/chatHook";
+import useSocket from "../hooks/socketHook";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 
 const MessageInput = () => {
-  const { selectedChat } = useChat();
+  const { updateRecentMessage, selectedChat, getMessagesForChat, setMessagesForChat } = useChat();
+  const { emitMessage } = useSocket();
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -14,7 +16,11 @@ const MessageInput = () => {
     }
     console.log("Sending message...");
     try {
-      await sendMessage(message, selectedChat.id);
+      const sentMessage = await sendMessage(message, selectedChat.id);
+      emitMessage(sentMessage);
+      const messages = getMessagesForChat(selectedChat.id) || [];
+      setMessagesForChat(selectedChat.id, [...messages, sentMessage]);
+      updateRecentMessage(sentMessage);
       setMessage("");
     } catch (error: any) {
       alert(error.message);
@@ -35,7 +41,7 @@ const MessageInput = () => {
           type="submit"
           className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg cursor-pointer"
         >
-          <PaperAirplaneIcon className="size-6"/>
+          <PaperAirplaneIcon className="size-6" />
         </button>
       </form>
     </div>
