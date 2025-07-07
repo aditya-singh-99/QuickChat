@@ -24,7 +24,8 @@ export const getChats = async (req: Request, res: Response) => {
                 users: {
                     select: {
                         id: true,
-                        name: true
+                        name: true,
+                        email: true
                     }
                 },
                 messages: {
@@ -136,7 +137,7 @@ export const updateGroup = async (req: Request, res: Response) => {
 export const addParticipant = async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
-        await prisma.chat.update({
+        const chat = await prisma.chat.update({
             where: {
                 id: req.body.id,
                 isGroup: true,
@@ -148,9 +149,18 @@ export const addParticipant = async (req: Request, res: Response) => {
                         id: req.body.participant
                     }
                 }
+            },
+            select: {
+                users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
             }
         });
-        res.status(201).json({ message: "Participant added to the group successfully." });
+        res.status(201).json({ chat, message: "Participant added to the group successfully." });
     } catch (error: any) {
         console.error("Error in chat controller:", error.message);
         res.status(400).json({ error: "Error occurred during adding participant." });
@@ -160,7 +170,7 @@ export const addParticipant = async (req: Request, res: Response) => {
 export const removeParticipant = async (req: Request, res: Response) => {
     try {
         const user = (req as any).user;
-        await prisma.chat.update({
+        const chat = await prisma.chat.update({
             where: {
                 id: req.body.id,
                 isGroup: true,
@@ -172,9 +182,18 @@ export const removeParticipant = async (req: Request, res: Response) => {
                         id: req.body.participant
                     }
                 }
+            },
+            select: {
+                users: {
+                    select: {
+                        id: true,
+                        name: true,
+                        email: true
+                    }
+                }
             }
         });
-        res.status(201).json({ message: "Participant removed from the group successfully." });
+        res.status(201).json({ chat, message: "Participant removed from the group successfully." });
     } catch (error: any) {
         console.error("Error in chat controller:", error.message);
         res.status(400).json({ error: "Error occurred during removing participant." });

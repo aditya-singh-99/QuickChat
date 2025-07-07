@@ -5,7 +5,9 @@ import { fetchAllChats } from "../services/chatService";
 
 interface ChatContextType {
   chats: Chat[];
+  setChats: (chats: Chat[]) => void;
   addNewChat: (chat: Chat) => void;
+  removeChat: (chat: Chat) => void;
   updateRecentMessage: (message: Message) => void;
   selectedChat: Chat | null;
   setSelectedChat: (chat: Chat) => void;
@@ -46,6 +48,13 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     setChats((prev) => [chat, ...prev]);
   };
 
+  const removeChat = (chat: Chat) => {
+    if (selectedChat?.id === chat.id) {
+      setSelectedChat(null);
+    }
+    setChats((prev) => prev.filter(c => c.id !== chat.id));
+  };
+
   const updateRecentMessage = (message: Message) => {
     setChats((prevChats) => {
       const updatedChats = prevChats.map((chat) =>
@@ -73,7 +82,7 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <ChatContext value={{ chats, addNewChat, updateRecentMessage, selectedChat, setSelectedChat, getMessagesForChat, setMessagesForChat }}>
+    <ChatContext value={{ chats, setChats, addNewChat, removeChat, updateRecentMessage, selectedChat, setSelectedChat, getMessagesForChat, setMessagesForChat }}>
       {children}
     </ChatContext>
   )

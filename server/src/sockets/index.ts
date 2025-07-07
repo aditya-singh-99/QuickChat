@@ -22,6 +22,14 @@ export const socketHandler = (io: Server) => {
             });
         });
 
+        socket.on("group:add", ({ user, chat }) => {
+            io.to(user.id).emit("group:added", chat);
+        });
+
+        socket.on("group:remove", ({ user, chat }) => {
+            io.to(user.id).emit("group:removed", chat);
+        });
+
         socket.on("disconnect", () => {
             console.log(`User disconnected: ${user.id}`);
         });
