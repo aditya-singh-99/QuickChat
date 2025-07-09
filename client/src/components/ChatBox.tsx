@@ -4,10 +4,13 @@ import MessageInput from "./MessageInput";
 import useChat from "../hooks/chatHook";
 import { fetchMessages } from "../services/messageService";
 import ManageGroupModal from "./ManageGroupModal";
+import { Link } from "react-router";
+import useAuth from "../hooks/authHook";
 import { UserGroupIcon, UserIcon } from "@heroicons/react/24/solid";
 
 const ChatBox = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { user: currentUser } = useAuth();
   const { selectedChat, getMessagesForChat, setMessagesForChat } = useChat();
   const messages = selectedChat ? getMessagesForChat(selectedChat.id) || [] : [];
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -53,18 +56,28 @@ const ChatBox = () => {
             {selectedChat
               ? selectedChat.isGroup
                 ? selectedChat.name
-                : selectedChat.users[0].id === selectedChat.id
+                : selectedChat.users[0].id === currentUser?.id
                   ? selectedChat.users[1].name
                   : selectedChat.users[0].name
-              : "Selected Chat"}
+              : "Select a Chat to view Messages"}
           </h2>
         </div>
 
-        {selectedChat?.isGroup && (
-          <button onClick={() => setIsModalOpen(true)} className="text-sm text-green-400 hover:text-green-500 font-medium">
-            Manage Group
+        {selectedChat && (selectedChat.isGroup ? (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="text-sm text-green-400 hover:text-green-500 font-medium cursor-pointer"
+          >
+            View Group
           </button>
-        )}
+        ) : (
+          <Link
+            to={`/profile/${selectedChat.users[0].id === currentUser?.id ? selectedChat.users[1].id : selectedChat.users[0].id}`}
+            className="text-sm text-green-400 hover:text-green-500 font-medium"
+          >
+            View Profile
+          </Link>
+        ))}
         {isModalOpen && <ManageGroupModal onClose={() => setIsModalOpen(false)} />}
       </div>
 

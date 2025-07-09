@@ -19,3 +19,19 @@ export const searchUsers = async (query: string) => {
     throw new Error(error.response?.data?.error || error.message || "Error searching for users.");
   }
 };
+
+export const getUserById = async (id: string) => {
+  try {
+    const token = localStorage.getItem("JWTtoken");
+    const response = await axios.get(`${API_BASE}/${id}`, {
+      headers: {
+        Authorization: token
+      }
+    });
+    const { user } = response.data;
+    return user as User;
+  } catch (error: any) {
+    console.log("Error from / usersRoute:", error.response?.data?.error || error.message);
+    throw new Error(error.response?.data?.error || error.message || "Error fetching user.");
+  }
+};

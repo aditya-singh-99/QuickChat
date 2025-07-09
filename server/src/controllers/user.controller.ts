@@ -34,7 +34,7 @@ export const searchUsers = async (req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const users = await prisma.user.findUnique({
+        const user = await prisma.user.findUnique({
             where: {
                 id: id
             },
@@ -42,7 +42,7 @@ export const getUser = async (req: Request, res: Response) => {
                 password: true
             }
         });
-        res.status(200).json({ users, message: "User retrieval successful." });
+        res.status(200).json({ user, message: "User retrieval successful." });
     } catch (error: any) {
         console.error("Error in user controller:", error.message);
         res.status(400).json({ error: "Error occurred during user retrieval." });
