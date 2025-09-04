@@ -30,6 +30,14 @@ export const socketHandler = (io: Server) => {
             io.to(user.id).emit("group:removed", chat);
         });
 
+        socket.on("typing:start", ({ chatId }) => {
+            socket.to(chatId).emit("typing:start", { chatId, user });
+        });
+
+        socket.on("typing:stop", ({ chatId }) => {
+            socket.to(chatId).emit("typing:stop", { chatId, user });
+        });
+
         socket.on("disconnect", () => {
             console.log(`User disconnected: ${user.id}`);
         });

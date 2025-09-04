@@ -18,12 +18,14 @@ interface SocketContextType {
   emitChatCreation: (chat: Chat) => void;
   emitAddMember: (user: User, chat: Chat) => void;
   emitRemoveMember: (user: User, chat: Chat) => void;
+  emitTypingStart: (chatId: string) => void;
+  emitTypingStop: (chatId: string) => void;
 }
 
 export const SocketContext = createContext<SocketContextType | null>(null);
 
 const SocketProvider = ({ children }: { children: React.ReactNode }) => {
-  const { chats, addNewChat, removeChat, updateRecentMessage, getMessagesForChat, setMessagesForChat } = useChat();
+  const { chats, addNewChat, removeChat, updateRecentMessage, getMessagesForChat, setMessagesForChat, addTypingUser, removeTypingUser } = useChat();
 
   useEffect(() => {
     socket.connect();
@@ -45,6 +47,14 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       addNewChat(chat);
     };
 
+    const handleTypingStart = ({ chatId, user }: { chatId: string; user: User }) => {
+      addTypingUser(chatId, user);
+    };
+    
+    const handleTypingStop = ({ chatId, user }: { chatId: string; user: User }) => {
+      removeTypingUser(chatId, user);
+    };
+
     const handleGroupRemoved = (chat: Chat) => {
       removeChat(chat);
     };
@@ -53,12 +63,16 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     socket.on("chat:created", handleChatCreated);
     socket.on("group:added", handleGroupAdded);
     socket.on("group:removed", handleGroupRemoved);
+    socket.on("typing:start", handleTypingStart);
+    socket.on("typing:stop", handleTypingStop);
 
     return () => {
       socket.off("message:received", handleMessageReceived);
       socket.off("chat:created", handleChatCreated);
       socket.off("group:added", handleGroupAdded);
       socket.off("group:removed", handleGroupRemoved);
+      socket.off("typing:start", handleTypingStart);
+      socket.off("typing:stop", handleTypingStop);
       socket.disconnect();
     };
   }, [chats, getMessagesForChat]);
@@ -80,8 +94,16 @@ const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     socket.emit("group:remove", { user, chat });
   };
 
+  const emitTypingStart = (chatId: string) => {
+    socket.emit("typing:start", { chatId });
+  };
+
+  const emitTypingStop = (chatId: string) => {
+    socket.emit("typing:stop", { chatId });
+  };
+
   return (
-    <SocketContext value={{ emitMessage, emitChatCreation, emitAddMember, emitRemoveMember }}>
+    <SocketContext value={{ emitMessage, emitChatCreation, emitAddMember, emitRemoveMember, emitTypingStart, emitTypingStop }}>
       {children}
     </SocketContext>
   )

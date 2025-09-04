@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+import type { User } from "../types/User";
 import type { Chat } from "../types/Chat";
 import type { Message } from "../types/Message";
 import { fetchAllChats } from "../services/chatService";
@@ -13,6 +14,9 @@ interface ChatContextType {
   setSelectedChat: (chat: Chat) => void;
   getMessagesForChat: (chatId: string) => Message[] | undefined;
   setMessagesForChat: (chatId: string, messages: Message[]) => void;
+  typingUsersMap: Map<string, User[]>;
+  addTypingUser: (chatId: string, user: User) => void;
+  removeTypingUser: (chatId: string, user: User) => void;
 }
 
 export const ChatContext = createContext<ChatContextType | null>(null);
@@ -21,6 +25,7 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [messagesMap, setMessagesMap] = useState<Map<string, Message[]>>(new Map());
+  const [typingUsersMap, setTypingUsersMap] = useState<Map<string, User[]>>(new Map());
 
   const sortChats = (chatList: Chat[]) => {
     return chatList.sort((a, b) => {
@@ -81,8 +86,29 @@ const ChatProvider = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const addTypingUser = (chatId: string, user: User) => {
+    setTypingUsersMap((prev) => {
+      const newMap = new Map(prev);
+      const existing = newMap.get(chatId) || [];
+      if (!existing.some((u) => u.id === user.id)) {
+        newMap.set(chatId, [...existing, user]);
+      }
+      return newMap;
+    });
+  };
+
+  const removeTypingUser = (chatId: string, user: User) => {
+    setTypingUsersMap((prev) => {
+      const newMap = new Map(prev);
+      const existing = newMap.get(chatId) || [];
+      newMap.set(chatId, existing.filter((u) => u.id !== user.id));
+      return newMap;
+    });
+  };
+
+
   return (
-    <ChatContext value={{ chats, setChats, addNewChat, removeChat, updateRecentMessage, selectedChat, setSelectedChat, getMessagesForChat, setMessagesForChat }}>
+    <ChatContext value={{ chats, setChats, addNewChat, removeChat, updateRecentMessage, selectedChat, setSelectedChat, getMessagesForChat, setMessagesForChat, typingUsersMap, addTypingUser, removeTypingUser }}>
       {children}
     </ChatContext>
   )

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { sendMessage } from "../services/messageService";
 import useChat from "../hooks/chatHook";
 import useSocket from "../hooks/socketHook";
@@ -6,8 +6,41 @@ import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
 
 const MessageInput = () => {
   const { updateRecentMessage, selectedChat, getMessagesForChat, setMessagesForChat } = useChat();
-  const { emitMessage } = useSocket();
+  const { emitMessage, emitTypingStart, emitTypingStop } = useSocket();
   const [message, setMessage] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!selectedChat) return;
+    setMessage(e.target.value);
+
+    if (e.target.value.length > 0) {
+      if (!isTyping) {
+        emitTypingStart(selectedChat.id);
+        setIsTyping(true);
+      }
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+
+      typingTimeoutRef.current = setTimeout(() => {
+        emitTypingStop(selectedChat.id);
+        setIsTyping(false);
+        typingTimeoutRef.current = null;
+      }, 2000);
+    } else {
+      if (isTyping) {
+        emitTypingStop(selectedChat.id);
+        setIsTyping(false);
+      }
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+        typingTimeoutRef.current = null;
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +68,7 @@ const MessageInput = () => {
           placeholder="Type a message..."
           className="flex-1 px-4 py-2 bg-slate-800 text-white rounded-lg border border-slate-600 focus:outline-none focus:ring-2 focus:ring-green-500"
           value={message}
-          onChange={(e) => setMessage(e.target.value)}
+          onChange={(e) => handleChange(e)}
         />
         <button
           type="submit"

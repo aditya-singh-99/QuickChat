@@ -11,7 +11,7 @@ import { UserGroupIcon, UserIcon } from "@heroicons/react/24/solid";
 const ChatBox = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { user: currentUser } = useAuth();
-  const { selectedChat, getMessagesForChat, setMessagesForChat } = useChat();
+  const { selectedChat, getMessagesForChat, setMessagesForChat, typingUsersMap } = useChat();
   const messages = selectedChat ? getMessagesForChat(selectedChat.id) || [] : [];
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
@@ -38,6 +38,12 @@ const ChatBox = () => {
     };
     loadChat();
   }, [selectedChat]);
+
+  const typingUsers = selectedChat
+    ? (typingUsersMap.get(selectedChat.id) || []).filter(
+      (u) => u.id !== currentUser?.id
+    )
+    : [];
 
   return (
     <div className="h-full flex flex-col">
@@ -86,8 +92,14 @@ const ChatBox = () => {
         <>
           <div className="flex-1 overflow-y-auto px-4 py-2 space-y-2">
             {messages.map((message, i) => (
-              <MessageBubble message={message} key={i} />
+              <MessageBubble message={message} users={selectedChat.users} key={i} />
             ))}
+            {typingUsers.length > 0 && (
+              <div className="text-xs text-gray-400 italic ml-2">
+                {typingUsers.map((u) => u.name).join(", ")}{" "}
+                {typingUsers.length === 1 ? "is typing..." : "are typing..."}
+              </div>
+            )}
             <div ref={scrollRef}></div>
           </div>
 
